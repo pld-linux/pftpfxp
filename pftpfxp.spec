@@ -16,10 +16,10 @@ BuildRequires:	openssl-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-pftpfxp - a command line FXP client.
+pftpfxp is a command line FXP client.
 
 %description -l pl
-pftpfxp - klient FXP dzia³aj±cy z linii poleceñ.
+pftpfxp jest klientem FXP dzia³aj±cym z linii poleceñ.
 
 %prep
 %setup -q -c
