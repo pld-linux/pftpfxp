@@ -12,7 +12,7 @@ Source0:	http://pftpmew.tanesha.net/content/%{name}-v%{version}.tgz
 # Source0-md5:	22528192327488a372a6de1f5d2709dc
 URL:		http://pftpmew.tanesha.net/
 BuildRequires:	ncurses-devel
-BuildRequires:	openssl-devel
+BuildRequires:	openssl-devel >= 0.9.7d
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
