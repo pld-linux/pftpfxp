@@ -4,12 +4,12 @@
 Summary:	pftpfxp - a command line FXP client
 Summary(pl):	pftpfxp - klient FXP dzia³aj±cy z linii poleceñ
 Name:		pftpfxp
-Version:	0.11.4mew5e
+Version:	0.11.4mew6
 Release:	1
 License:	unknown
 Group:		Applications/Networking
 Source0:	http://pftpmew.tanesha.net/content/%{name}-v%{version}.tgz
-# Source0-md5:	e74f9beb26bb485690e5d0a547565728
+# Source0-md5:	22528192327488a372a6de1f5d2709dc
 URL:		http://pftpmew.tanesha.net/
 BuildRequires:	ncurses-devel
 BuildRequires:	openssl-devel
@@ -27,7 +27,8 @@ cd %{name}-mew
 ./configure lnx \
 	--openssldir /usr/include/openssl
 
-%{__make} CPP=%{__cc} \
+%{__make} dynamic \
+	CPP=%{__cc} \
 	CPPFLAGS="%{rpmcflags} -Wall -D_REENTRANT -I../include -I/usr/include/ncurses"
 
 %install
