@@ -31,7 +31,7 @@ cd %{name}-mew
 	--openssldir /usr/include/openssl
 
 %{__make} dynamic \
-	CPP=%{__cc} \
+	CPP="%{__cc}" \
 	CPPFLAGS="%{rpmcflags} -Wall -D_REENTRANT -DTLS -I../include -I/usr/include/ncurses" \
 	LINKFLAGS="-lpanel -lncurses -lpthread -lssl -lstdc++"
 
