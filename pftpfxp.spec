@@ -33,7 +33,7 @@ cd %{name}-mew
 %{__make} dynamic \
 	CPP="%{__cc}" \
 	CPPFLAGS="%{rpmcflags} -Wall -D_REENTRANT -DTLS -I../include -I/usr/include/ncurses" \
-	LINKFLAGS="-lpanel -lncurses -lpthread -lssl -lstdc++"
+	LINKFLAGS="-lpanel -lncurses -lpthread -lssl -lcrypto -lstdc++ -ldl"
 
 %install
 rm -rf $RPM_BUILD_ROOT
