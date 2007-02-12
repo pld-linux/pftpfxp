@@ -2,7 +2,7 @@
 # - make subpackage with autoconnect
 #
 Summary:	pftpfxp - a command line FXP client
-Summary(pl):	pftpfxp - klient FXP dzia³aj±cy z linii poleceñ
+Summary(pl.UTF-8):   pftpfxp - klient FXP dziaÅ‚ajÄ…cy z linii poleceÅ„
 Name:		pftpfxp
 Version:	0.11.4mew6
 Release:	2
@@ -19,8 +19,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 pftpfxp is a command line FXP client.
 
-%description -l pl
-pftpfxp jest klientem FXP dzia³aj±cym z linii poleceñ.
+%description -l pl.UTF-8
+pftpfxp jest klientem FXP dziaÅ‚ajÄ…cym z linii poleceÅ„.
 
 %prep
 %setup -q -c
