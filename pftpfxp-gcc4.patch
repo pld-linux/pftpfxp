@@ -1,0 +1,14 @@
+diff -Nur pftpfxp-0.11.4mew6-orig/pftpfxp-mew/src/server.cc pftpfxp-0.11.4mew6/pftpfxp-mew/src/server.cc
+--- pftpfxp-0.11.4mew6-orig/pftpfxp-mew/src/server.cc	2003-11-09 20:51:19.000000000 +0100
++++ pftpfxp-0.11.4mew6/pftpfxp-mew/src/server.cc	2008-12-28 23:18:25.000000000 +0100
+@@ -5357,8 +5357,8 @@
+         finished = FALSE;
+         int f, d;
+         FILELIST **dir_list, **file_list;
+-        dir_list = new (FILELIST *)[dir_count];
+-        file_list = new (FILELIST *)[file_count];
++        dir_list = new FILELIST *[dir_count];
++        file_list = new FILELIST *[file_count];
+ 
+         //make arrays for the sorting
+         fl_temp = this->internal_filelist;
