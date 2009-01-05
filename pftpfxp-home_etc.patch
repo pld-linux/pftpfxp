@@ -1,0 +1,224 @@
+diff -Nur pftpfxp-0.11.4mew6-orig/pftpfxp-mew/src/bookmark.cc pftpfxp-0.11.4mew6/pftpfxp-mew/src/bookmark.cc
+--- pftpfxp-0.11.4mew6-orig/pftpfxp-mew/src/bookmark.cc	2003-11-09 00:00:00.000000000 +0100
++++ pftpfxp-0.11.4mew6/pftpfxp-mew/src/bookmark.cc	2009-01-05 16:31:10.000000000 +0100
+@@ -23,15 +23,37 @@
+     char *line = new(char[2048]), *enc = new(char[4096]);
+     BOOKMARK *bm_temp = global_bookmark;
+     char tempcwd[SERVER_WORKINGDIR_SIZE];
++    char *home_directory;
++    char *bookmark_file;
++    char *bookmark_file_bak;
++    const char *bookmarkrc = BOOKMARK_RC;
++    const char *bookmarkrcbak = BOOKMARK_RC_BAK;
++    int n;
++    
++    home_directory = getenv("HOME_ETC") ? getenv("HOME_ETC") : getenv("HOME");
+ 
++    n = strlen(home_directory) + strlen(bookmarkrc) + 2;
++    if ((bookmark_file = (char*)malloc(n)) == NULL) {
++	    fprintf(stderr,"error allocating memory\n");
++	    exit( -1);
++    }
++    sprintf(bookmark_file, "%s/%s", home_directory, bookmarkrc);
++    
++    n = strlen(home_directory) + strlen(bookmarkrcbak) + 2;
++    if ((bookmark_file_bak = (char*)malloc(n)) == NULL) {
++	    fprintf(stderr,"error allocating memory\n");
++	    exit( -1);
++    }
++    sprintf(bookmark_file_bak, "%s/%s", home_directory, bookmarkrcbak);
++    
+     getcwd(tempcwd, SERVER_WORKINGDIR_SIZE);
+     chdir(startcwd);
+ 
+     // backup old bookmark-file
+-    rename(BOOKMARK_RC, BOOKMARK_RC_BAK);
++    rename(bookmark_file, bookmark_file_bak);
+ 
+     pass_pos = 0;
+-    if ((file_out = fopen(BOOKMARK_RC, "w"))) {
++    if ((file_out = fopen(bookmark_file, "w"))) {
+         // put magic and version number
+         strcpy(line, PASS_MAGIC);
+         Encrypt(line, enc);
+@@ -297,6 +319,8 @@
+     delete[](line);
+     delete[](enc);
+     chdir(tempcwd);
++    free(bookmark_file);
++    free(bookmark_file_bak);
+ }
+ 
+ void CDisplayHandler::Decrypt(char *in, char *out) {
+@@ -383,12 +407,25 @@
+     char *line = new(char[4096]), *out = new(char[2048]);
+     BOOKMARK *bm_new, *bm_temp = NULL;
+     char tempcwd[SERVER_WORKINGDIR_SIZE];
++    char *home_directory;
++    char *bookmark_file;
++    const char *bookmarkrc = BOOKMARK_RC;
++    int n;
++
++    home_directory = getenv("HOME_ETC") ? getenv("HOME_ETC") : getenv("HOME");
++
++    n = strlen(home_directory) + strlen(bookmarkrc) + 2;
++    if ((bookmark_file = (char*)malloc(n)) == NULL) {
++	    fprintf(stderr,"error allocating memory\n");
++	    exit( -1);
++    }
++    sprintf(bookmark_file, "%s/%s", home_directory, bookmarkrc);
+ 
+     getcwd(tempcwd, SERVER_WORKINGDIR_SIZE);
+     chdir(startcwd);
+ 
+     pass_pos = 0;
+-    if ((file_in = fopen(BOOKMARK_RC, "r"))) {
++    if ((file_in = fopen(bookmark_file, "r"))) {
+         // check bookmark-id
+         fgets(line, 4095, file_in);
+ 
+@@ -2306,6 +2343,7 @@
+     delete[](line);
+     delete[](out);
+     chdir(tempcwd);
++    free(bookmark_file);
+     return (FALSE);
+ }
+ 
+@@ -2313,11 +2351,24 @@
+     FILE *file_probe;
+     char tempcwd[SERVER_WORKINGDIR_SIZE];
+     char *line;
++    char *home_directory;
++    char *bookmark_file;
++    const char *bookmarkrc = BOOKMARK_RC;
++    int n;
++
++    home_directory = getenv("HOME_ETC") ? getenv("HOME_ETC") : getenv("HOME");
++
++    n = strlen(home_directory) + strlen(bookmarkrc) + 2;
++    if ((bookmark_file = (char*)malloc(n)) == NULL) {
++	    fprintf(stderr,"error allocating memory\n");
++	    exit( -1);
++    }
++    sprintf(bookmark_file, "%s/%s", home_directory, bookmarkrc);
+ 
+     getcwd(tempcwd, SERVER_WORKINGDIR_SIZE);
+     chdir(startcwd);
+ 
+-    if ((file_probe = fopen(BOOKMARK_RC, "r"))) {
++    if ((file_probe = fopen(bookmark_file, "r"))) {
+         // check bookmark-id
+         line = new(char[4096]);
+         fgets(line, 4095, file_probe);
+@@ -2361,6 +2412,7 @@
+         chdir(tempcwd);
+         return (2);
+     }
++    free(bookmark_file);
+ }
+ 
+ void CDisplayHandler::DialogNotice(char *notice, char *button) {
+diff -Nur pftpfxp-0.11.4mew6-orig/pftpfxp-mew/src/main.cc pftpfxp-0.11.4mew6/pftpfxp-mew/src/main.cc
+--- pftpfxp-0.11.4mew6-orig/pftpfxp-mew/src/main.cc	2003-11-09 21:20:00.000000000 +0100
++++ pftpfxp-0.11.4mew6/pftpfxp-mew/src/main.cc	2009-01-05 17:07:01.000000000 +0100
+@@ -547,7 +547,7 @@
+                 if ((*label != '\0') && (strlen(value) > 0)) {
+                     if (!strcasecmp(label, "DEVICE")) {
+                         if (!DetermineOwnIP(value)) {
+-                            printf("unknown network device '%s', sorry.\n",
++                            fprintf(stderr, "unknown network device '%s', sorry.\n",
+                                    value);
+                             fclose(in_file);
+                             return (FALSE);
+@@ -705,7 +705,7 @@
+                         strcpy(sectionlabels[21], value);
+                         //debuglog("section22: %s", sectionlabels[21]);
+                     } else {
+-                        printf("unknown label '%s' in configfile.\n", label);
++                        fprintf(stderr, "unknown label '%s' in configfile.\n", label);
+                         fclose(in_file);
+                         return (FALSE);
+                     }
+@@ -1096,9 +1096,30 @@
+ }
+ 
+ int main(int argc, char **argv) {
+-    char msg[256], config_file[] = {".pftp/config"}, keymap_file[] = {".pftp/keymap"};
++    char msg[256];
++    char *config_file;
++    char *keymap_file;
++    char *home_directory;
+     int n;
+ 
++    home_directory = getenv("HOME_ETC") ? getenv("HOME_ETC") : getenv("HOME");
++
++    n = strlen(home_directory) + sizeof("/.pftp/config") + 1;
++    if ((config_file = (char*)malloc(n)) == NULL) {
++	    fprintf(stderr,"error allocating memory\n");
++	    exit(-1);
++    }
++
++    n = strlen(home_directory) + sizeof("/.pftp/keymap") + 1;
++    if ((keymap_file = (char*)malloc(n)) == NULL) {
++	    free(config_file);
++	    fprintf(stderr,"error allocating memory\n");
++	    exit(-1);
++    }
++
++    sprintf(config_file, "%s/.pftp/config", home_directory);
++    sprintf(keymap_file, "%s/.pftp/keymap", home_directory);
++
+     pthread_mutex_init(&syscall_lock, NULL);
+     pthread_mutex_init(&sigwinch_lock, NULL);
+ 
+@@ -1137,40 +1158,43 @@
+     getcwd(startcwd, SERVER_WORKINGDIR_SIZE);
+ 
+     if (!ReadConfig(config_file)) {
+-        printf("error reading/parsing configfile '%s', bailing out.\n", config_file);
++        fprintf(stderr, "error reading/parsing configfile '%s', bailing out.\n", config_file);
+         exit( -1);
+     }
+ 
+     unlinklog();
+ 
+     if (!ReadKeymap(keymap_file)) {
+-        printf("error reading/parsing keymapfile '%s', bailing out.\n", keymap_file);
++        fprintf(stderr, "error reading/parsing keymapfile '%s', bailing out.\n", keymap_file);
+         exit( -1);
+     }
+     debuglog("after keymap");
+ 
+     if (display->ProbeBookmarkRC() == 1) {
+-        printf("unknown or invalid bookmark file found, delete it\n");
++        fprintf(stderr, "unknown or invalid bookmark file found, delete it\n");
+         exit( -1);
+     }
+ 
+     if (chdir(localdir) != 0) {
+-        printf("please specify a valid dir for the LOCALDIR label or comment it out\n");
++        fprintf(stderr, "please specify a valid dir for the LOCALDIR label or comment it out\n");
+         exit ( -1);
+     }
+ 
+     if (!use_own_ip) {
+-        printf("you need to specify a network-device in the configfile.\n");
++        fprintf(stderr, "you need to specify a network-device in the configfile.\n");
+         exit( -1);
+     }
+ 
+     if (!use_okay_dir) {
+-        printf("you need to specify a dir for the .okay and .error files in the configfile.\n");
++        fprintf(stderr, "you need to specify a dir for the .okay and .error files in the configfile.\n");
+         exit( -1);
+     }
+ 
+     debuglog("pftp start");
+ 
++    free(config_file);
++    free(keymap_file);
++
+     //CheckIP();
+ #ifdef TLS
+     if (tls_init())
