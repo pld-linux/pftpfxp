@@ -11,6 +11,7 @@ Group:		Applications/Networking
 Source0:	http://pftpmew.tanesha.net/content/%{name}-v%{version}.tgz
 # Source0-md5:	22528192327488a372a6de1f5d2709dc
 Patch0:		%{name}-gcc4.patch
+Patch1:		%{name}-home_etc.patch
 URL:		http://pftpmew.tanesha.net/
 BuildRequires:	ncurses-devel
 BuildRequires:	ncurses-ext-devel
@@ -26,6 +27,7 @@ pftpfxp jest klientem FXP działającym z linii poleceń.
 %prep
 %setup -q -c
 %patch0 -p1
+%patch1 -p1
 
 %build
 cd %{name}-mew
