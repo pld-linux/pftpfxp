@@ -26,8 +26,8 @@ pftpfxp jest klientem FXP działającym z linii poleceń.
 
 %prep
 %setup -q -c
-%patch0 -p1
-%patch1 -p1
+%patch -P0 -p1
+%patch -P1 -p1
 
 %build
 cd %{name}-mew
